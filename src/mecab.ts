@@ -1,7 +1,12 @@
 import RNFS from 'react-native-fs';
 import { NativeModules, Platform } from 'react-native';
 
-type State = 'uninitialized' | 'initializing' | 'initialized' | 'disposed';
+type State =
+  | 'uninitialized'
+  | 'initializing'
+  | 'initialized'
+  | 'disposed'
+  | 'failed';
 
 const linkingError =
   `The package 'react-native-mecab' doesn't seem to be linked. Make sure: \n\n` +
@@ -50,7 +55,11 @@ export class MeCab {
         `Cannot call \`init(...)\`, mecab ${
           this.state === 'initializing'
             ? 'is currently initiazing'
-            : 'has already been initialized'
+            : this.state === 'initialized'
+            ? 'has already been initialized'
+            : this.state === 'disposed'
+            ? 'has been disposed of'
+            : 'is in a failed state'
         }.`
       );
     }
@@ -67,7 +76,7 @@ export class MeCab {
 
     try {
       if (!(await RNFS.existsAssets(dictionaryDirectory))) {
-        this.state = 'uninitialized';
+        this.state = 'failed';
         throw new Error(
           `Path "${dictionaryDirectory}" was not found in the application assets.`
         );
@@ -93,7 +102,7 @@ export class MeCab {
     }
 
     if (missingFiles.length > 0) {
-      this.state = 'uninitialized';
+      this.state = 'failed';
       this.throwInit(
         `Invalid contents of the dictionary directory. The following files are missing: "${missingFiles.join(
           '", "'
@@ -117,14 +126,14 @@ export class MeCab {
   }
 
   public async tokenize(query: string): Promise<string> {
-    this.throwIfUninitializedOrDisposed();
+    this.throwIfInvalidState();
 
     await this.initializationPromise;
     return await MecabModule.parse(this.pointerKey, query);
   }
 
   public async dispose(): Promise<void> {
-    this.throwIfUninitializedOrDisposed();
+    this.throwIfInvalidState();
 
     await this.initializationPromise;
     this.state = 'disposed';
@@ -132,11 +141,12 @@ export class MeCab {
   }
 
   private throwInit(message: string) {
-    this.rejectInitialization(message);
-    throw new Error(message);
+    const error = new Error(message);
+    this.rejectInitialization(error);
+    throw error;
   }
 
-  private throwIfUninitializedOrDisposed() {
+  private throwIfInvalidState() {
     if (this.state === 'uninitialized') {
       throw new Error(
         'Mecab was not initialized. Did you forget to run `init(...)`?'
