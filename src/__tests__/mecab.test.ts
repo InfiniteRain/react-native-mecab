@@ -21,7 +21,7 @@ jest.mock('react-native', () => ({
     Mecab: {
       initTagger: jest.fn(),
       parse: jest.fn(),
-      dispose: async (_pointerKey: string) => void 0,
+      dispose: jest.fn(),
     },
   },
 }));
@@ -280,6 +280,80 @@ describe('Mecab', () => {
       ).toEqual(1);
 
       await tokenizePromise;
+    });
+  });
+
+  describe('Dispose', () => {
+    it('Should not work in invalid states', async () => {
+      mockedRNFS.existsAssets.mockResolvedValue(true);
+
+      const mecab = new MeCab();
+      await expect(mecab.dispose()).rejects.toThrow(
+        'Mecab was not initialized. Did you forget to run `init(...)`?'
+      );
+
+      await expect(mecab.init('ipadic')).resolves.toBeUndefined();
+      await expect(mecab.dispose()).resolves.toBeUndefined();
+      await expect(mecab.dispose()).rejects.toThrow(
+        'This instance has been disposed of.'
+      );
+
+      mockedRNFS.existsAssets.mockReset();
+      mockedRNFS.existsAssets.mockResolvedValue(false);
+
+      const mecab2 = new MeCab();
+      await expect(mecab2.init('ipadic')).rejects.toThrow(
+        'Path "ipadic" was not found in the application assets.'
+      );
+      await expect(mecab2.dispose()).rejects.toThrow(
+        'This instance is in a failed state.'
+      );
+    });
+
+    it('Should call dispose', async () => {
+      mockedRNFS.existsAssets.mockResolvedValue(true);
+      mockedReactNative.NativeModules.Mecab.initTagger.mockResolvedValue(
+        'pointer-key'
+      );
+
+      const mecab = new MeCab();
+      await mecab.init('ipadic');
+      await mecab.dispose();
+
+      expect(mockedReactNative.NativeModules.Mecab.dispose.mock.calls).toEqual([
+        ['pointer-key'],
+      ]);
+    });
+
+    it('Should await for initialization', async () => {
+      mockedRNFS.existsAssets.mockResolvedValue(true);
+
+      const mecab = new MeCab();
+      let resolveDispose!: (value: void | PromiseLike<void>) => void;
+      let disposePromise = new Promise<void>((resolve) => {
+        resolveDispose = resolve;
+      });
+
+      await expect(
+        mockedReactNative.NativeModules.Mecab.dispose.mock.calls.length
+      ).toEqual(0);
+
+      const initPromise = mecab.init('ipadic');
+      mecab.dispose().then(() => {
+        resolveDispose();
+      });
+
+      await expect(
+        mockedReactNative.NativeModules.Mecab.dispose.mock.calls.length
+      ).toEqual(0);
+
+      await initPromise;
+
+      await expect(
+        mockedReactNative.NativeModules.Mecab.dispose.mock.calls.length
+      ).toEqual(1);
+
+      await disposePromise;
     });
   });
 });
