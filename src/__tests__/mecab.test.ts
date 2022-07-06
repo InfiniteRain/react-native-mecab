@@ -20,8 +20,7 @@ jest.mock('react-native', () => ({
   NativeModules: {
     Mecab: {
       initTagger: jest.fn(),
-      parse: async (pointerKey: string, query: string) =>
-        `pointerKey: ${pointerKey}, query: ${query}`,
+      parse: jest.fn(),
       dispose: async (_pointerKey: string) => void 0,
     },
   },
@@ -187,8 +186,11 @@ describe('Mecab', () => {
       expect(mockedRNFS.writeFile.mock.calls.length).toEqual(0);
     });
 
-    it('Should create a tagger instance', async () => {
+    it('Should create a tagger instance and save the pointer key', async () => {
       mockedRNFS.existsAssets.mockResolvedValue(true);
+      mockedReactNative.NativeModules.Mecab.initTagger.mockResolvedValue(
+        'pointer-key'
+      );
 
       const mecab = new MeCab();
       await expect(mecab.init('ipadic')).resolves.toBeUndefined();
@@ -198,6 +200,86 @@ describe('Mecab', () => {
       ).toEqual([['/documents/ipadic']]);
       // @ts-expect-error Checking the internal state.
       expect(mecab.state).toEqual('initialized');
+      // @ts-expect-error Checking the internal state.
+      expect(mecab.pointerKey).toEqual('pointer-key');
+    });
+  });
+
+  describe('Tokenize', () => {
+    it('Should not work in invalid states', async () => {
+      mockedRNFS.existsAssets.mockResolvedValue(true);
+
+      const mecab = new MeCab();
+      await expect(mecab.tokenize('asd')).rejects.toThrow(
+        'Mecab was not initialized. Did you forget to run `init(...)`?'
+      );
+
+      await expect(mecab.init('ipadic')).resolves.toBeUndefined();
+      await expect(mecab.dispose()).resolves.toBeUndefined();
+      await expect(mecab.tokenize('asd')).rejects.toThrow(
+        'This instance has been disposed of.'
+      );
+
+      mockedRNFS.existsAssets.mockReset();
+      mockedRNFS.existsAssets.mockResolvedValue(false);
+
+      const mecab2 = new MeCab();
+      await expect(mecab2.init('ipadic')).rejects.toThrow(
+        'Path "ipadic" was not found in the application assets.'
+      );
+      await expect(mecab2.tokenize('asd')).rejects.toThrow(
+        'This instance is in a failed state.'
+      );
+    });
+
+    it('Should call parse', async () => {
+      mockedRNFS.existsAssets.mockResolvedValue(true);
+      mockedReactNative.NativeModules.Mecab.initTagger.mockResolvedValue(
+        'pointer-key'
+      );
+
+      const mecab = new MeCab();
+      await mecab.init('ipadic');
+      await mecab.tokenize('some query');
+
+      expect(mockedReactNative.NativeModules.Mecab.parse.mock.calls).toEqual([
+        ['pointer-key', 'some query'],
+      ]);
+    });
+
+    it('Should await for initialization', async () => {
+      mockedRNFS.existsAssets.mockResolvedValue(true);
+      mockedReactNative.NativeModules.Mecab.parse.mockResolvedValue(
+        'tokenization result'
+      );
+
+      const mecab = new MeCab();
+      let resolveTokenize!: (value: void | PromiseLike<void>) => void;
+      let tokenizePromise = new Promise<void>((resolve) => {
+        resolveTokenize = resolve;
+      });
+
+      await expect(
+        mockedReactNative.NativeModules.Mecab.parse.mock.calls.length
+      ).toEqual(0);
+
+      const initPromise = mecab.init('ipadic');
+      mecab.tokenize('some query').then((result) => {
+        expect(result).toEqual('tokenization result');
+        resolveTokenize();
+      });
+
+      await expect(
+        mockedReactNative.NativeModules.Mecab.parse.mock.calls.length
+      ).toEqual(0);
+
+      await initPromise;
+
+      await expect(
+        mockedReactNative.NativeModules.Mecab.parse.mock.calls.length
+      ).toEqual(1);
+
+      await tokenizePromise;
     });
   });
 });

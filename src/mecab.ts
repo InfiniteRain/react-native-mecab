@@ -156,5 +156,9 @@ export class MeCab {
     if (this.state === 'disposed') {
       throw new Error('This instance has been disposed of.');
     }
+
+    if (this.state === 'failed') {
+      throw new Error('This instance is in a failed state.');
+    }
   }
 }
