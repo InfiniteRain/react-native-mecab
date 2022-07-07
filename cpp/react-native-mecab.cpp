@@ -11,11 +11,22 @@ namespace rnmecab {
 	}
 
     std::string parse(MeCab::Tagger* tagger, std::string input) {
-        auto node = tagger->parseToNode(input.c_str());
+        auto inputStr = input.c_str();
+        auto node = tagger->parseToNode(inputStr);
         std::ostringstream resultStream;
 
         for (; node; node = node->next) {
-            resultStream << "surface: " << node->feature << std::endl;
+            if (node->stat == MECAB_BOS_NODE || node->stat == MECAB_EOS_NODE) {
+                continue;
+            }
+
+            auto surface = std::string(node->surface);
+
+            resultStream
+                << surface.substr(0, node->length)
+                << ": " 
+                << node->feature 
+                << std::endl;
         }
 
         return resultStream.str();
