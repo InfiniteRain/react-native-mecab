@@ -1,15 +1,37 @@
-import * as React from 'react';
-
-import { StyleSheet, View, Text } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { StyleSheet, View, TextInput, Button, Text } from 'react-native';
+import { useMeCabIpaDic } from 'react-native-mecab';
 
 export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
+  const [inputText, setInputText] = useState('これは猫です。');
+  const [enabled, setEnabled] = useState(true);
 
-  React.useEffect(() => {}, []);
+  const { result, state } = useMeCabIpaDic(inputText, { enabled });
+
+  const toggleEnabled = useCallback(() => {
+    setEnabled((previousValue) => !previousValue);
+  }, []);
 
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <Button
+        title={enabled ? 'Disable MeCab' : 'Enable MeCab'}
+        onPress={toggleEnabled}
+      />
+      <TextInput
+        style={styles.input}
+        onChangeText={setInputText}
+        value={inputText}
+      />
+      {state === 'ok' ? (
+        result.map((feature, index) => (
+          <Text key={index}>
+            {feature.surface} ({feature.reading ?? '?'})
+          </Text>
+        ))
+      ) : (
+        <Text>Loading...</Text>
+      )}
     </View>
   );
 }
@@ -20,9 +42,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+    width: 200,
   },
 });
