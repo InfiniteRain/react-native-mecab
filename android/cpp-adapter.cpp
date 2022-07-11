@@ -1,5 +1,5 @@
 #include <jni.h>
-#include <mecab.h>
+#include "mecab.h"
 #include <string>
 #include "react-native-mecab.h"
 

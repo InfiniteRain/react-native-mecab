@@ -1,7 +1,7 @@
 #ifndef RNMECAB_H
 #define RNMECAB_H
 
-#include <mecab.h>
+#include "mecab.h"
 #include <string>
 
 namespace rnmecab {

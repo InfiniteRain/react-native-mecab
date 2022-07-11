@@ -16,6 +16,7 @@ jest.mock('react-native-fs', () => {
 jest.mock('react-native', () => ({
   Platform: {
     select: () => '',
+    OS: 'android',
   },
   NativeModules: {
     Mecab: {

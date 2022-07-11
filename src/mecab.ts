@@ -75,7 +75,7 @@ export class MeCab {
     const documentDictionaryDirectory = `${documentDirectoryPath}/${dictionaryDirectory}`;
 
     try {
-      if (!(await RNFS.existsAssets(dictionaryDirectory))) {
+      if (!(await this.existsAssets(dictionaryDirectory))) {
         this.state = 'failed';
         throw new Error(
           `Path "${dictionaryDirectory}" was not found in the application assets.`
@@ -87,12 +87,12 @@ export class MeCab {
       for (const fileName of dictionaryFiles) {
         const assetFilePath = `${dictionaryDirectory}/${fileName}`;
 
-        if (!(await RNFS.existsAssets(assetFilePath))) {
+        if (!(await this.existsAssets(assetFilePath))) {
           missingFiles.push(fileName);
           continue;
         }
 
-        await RNFS.copyFileAssets(
+        await this.copyFileAssets(
           assetFilePath,
           `${documentDictionaryDirectory}/${fileName}`
         );
@@ -160,5 +160,35 @@ export class MeCab {
     if (this.state === 'failed') {
       throw new Error('This instance is in a failed state.');
     }
+  }
+
+  private async existsAssets(path: string) {
+    return Platform.OS === 'ios'
+      ? await RNFS.exists(`${RNFS.MainBundlePath}/${path}`)
+      : await RNFS.existsAssets(path);
+  }
+
+  private async copyFileAssets(filepath: string, destPath: string) {
+    if (Platform.OS === 'ios') {
+      try {
+        if (await RNFS.exists(destPath)) {
+          await RNFS.unlink(destPath);
+        }
+
+        await RNFS.copyFile(`${RNFS.MainBundlePath}/${filepath}`, destPath);
+      } catch (e) {
+        console.warn(
+          `Copying "${RNFS.MainBundlePath}/${filepath}" -> "${destPath}" failed. ` +
+            'This might occur due to two MeCab instances getting initialized with the same ' +
+            'dictionary directory at the same time. Generally speaking, multiple instances ' +
+            'of MeCab are only necessary when different dictionaries are required to be ' +
+            'used at the same time. Otherwise, only one instance is required for the ' +
+            'lifetime of the app.'
+        );
+      }
+      return;
+    }
+
+    await RNFS.copyFileAssets(filepath, destPath);
   }
 }

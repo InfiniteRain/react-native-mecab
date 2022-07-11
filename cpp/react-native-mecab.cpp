@@ -1,5 +1,5 @@
 #include "react-native-mecab.h"
-#include <mecab.h>
+#include "mecab.h"
 #include <sstream>
 
 namespace rnmecab {
