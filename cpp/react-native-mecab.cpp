@@ -3,12 +3,12 @@
 #include <sstream>
 
 namespace rnmecab {
-	MeCab::Tagger* initTagger(std::string dicdir) {
+    MeCab::Tagger* initTagger(std::string dicdir) {
         std::ostringstream paramStream;
         paramStream << "--dicdir " << dicdir << " --rcfile " << dicdir << "/mecabrc";
         auto paramString = paramStream.str();
         return MeCab::createTagger(paramString.c_str());
-	}
+    }
 
     std::string parse(MeCab::Tagger* tagger, std::string input) {
         auto inputStr = input.c_str();
