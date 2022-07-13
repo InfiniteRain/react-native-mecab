@@ -19,7 +19,7 @@ RCT_EXPORT_METHOD(initTagger:(nonnull NSString*)dicdir
                   withResolver:(RCTPromiseResolveBlock)resolve
                   withReject:(RCTPromiseRejectBlock)reject)
 {
-    id mecabPtr = @((long)rnmecab::initTagger([dicdir UTF8String]));
+    id mecabPtr = [NSValue valueWithPointer:rnmecab::initTagger([dicdir UTF8String])];
     id uuid = [NSUUID UUID];
     id key = [uuid UUIDString];
     
@@ -40,7 +40,7 @@ RCT_EXPORT_METHOD(parse:(nonnull NSString*)ptrKey
         return;
     }
 
-    auto tagger = (MeCab::Tagger*)[ptrMap[ptrKey] longValue];
+    auto tagger = (MeCab::Tagger*)[ptrMap[ptrKey] pointerValue];
     auto queryString = std::string([query UTF8String]);
     auto result = rnmecab::parse(tagger, queryString);
     
@@ -58,7 +58,7 @@ RCT_EXPORT_METHOD(dispose:(nonnull NSString*)ptrKey
         return;
     }
     
-    auto tagger = (MeCab::Tagger*)[ptrMap[ptrKey] longValue];
+    auto tagger = (MeCab::Tagger*)[ptrMap[ptrKey] pointerValue];
     rnmecab::dispose(tagger);
     [ptrMap removeObjectForKey:ptrKey];
     resolve(nil);
