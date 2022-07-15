@@ -6,7 +6,7 @@ export default function App() {
   const [inputText, setInputText] = useState('これは猫です。');
   const [enabled, setEnabled] = useState(true);
 
-  const { result, state } = useMeCabIpaDic(inputText, { enabled });
+  const { state, result, error } = useMeCabIpaDic(inputText, { enabled });
 
   const toggleEnabled = useCallback(() => {
     setEnabled((previousValue) => !previousValue);
@@ -29,8 +29,10 @@ export default function App() {
             {feature.surface} ({feature.reading ?? '?'})
           </Text>
         ))
-      ) : (
+      ) : state === 'loading' ? (
         <Text>Loading...</Text>
+      ) : (
+        <Text>{error.message ?? 'An unexpected error occurred.'}</Text>
       )}
     </View>
   );
