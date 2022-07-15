@@ -1,6 +1,6 @@
 # react-native-mecab
 
-A mecab wrapper for React Native
+A MeCab wrapper for React Native
 
 ## Table of Contents
 
@@ -42,12 +42,12 @@ npm install react-native-mecab
 
 MeCab requires some dictionary files to work. This module supports multiple dictionaries at the same time. Each dictionary has to be installed in a unique directory (dictionary directory) in the application's assets (on iOS the directory needs to be added to Copy Bundle Resources).
 
-This repository provides an [already-compiled IPADic](#) for download. IPADic is one of the most widely used dictionaries for MeCab. If you don't know which dictionary to choose, IPADic is a decent choice.
+This repository provides an [already-compiled IPADic](https://github.com/InfiniteRain/react-native-mecab/releases) for download. IPADic is one of the most widely used dictionaries for MeCab. If you don't know which dictionary to choose, IPADic is a decent choice.
 
 #### Preparing the dictionary files
 
-1. Download or compile the dictionary of choice ([click here to download a pre-compiled version of IPADic](#)).
-2. The following dictionary files should be present in a dictionary directory: `char.bin`, `dicrc`, `left-id.def`, `matrix.bin`, `pos-id.def`, `rewrite.def`, `right-id.def`, `sys.dic`, `unk.dic`.
+1. Download or compile the dictionary of choice ([click here to download a pre-compiled version of IPADic](https://github.com/InfiniteRain/react-native-mecab/releases)).
+2. The following dictionary files should be present in the dictionary directory: `char.bin`, `dicrc`, `left-id.def`, `matrix.bin`, `pos-id.def`, `rewrite.def`, `right-id.def`, `sys.dic`, `unk.dic`.
 
 #### Installing the dictionary on Android
 
@@ -60,14 +60,14 @@ This repository provides an [already-compiled IPADic](#) for download. IPADic is
 
 #### Installing the dictionary on iOS
 
-1. Open the `.xcworkspace` of you project's `ios` directory with XCode.
+1. Open the `.xcworkspace` in your project's `ios` directory with XCode.
 2. Drag and drop your dictionary directory into the main project. On the popup, make sure to select the following:
    - Check the `Copy items if needed` box.
    - Set the `Added folders` option to `Create folder references`.
 3. Make sure that the added directory is colored blue in the project view. If it isn't, repeat step 2.
 4. Add the dictionary directory to your project's `Copy Bundle Resources` setting:
    1. Navigate to TARGETS -> YourProjectName -> `Build Phases` tab -> Copy Bundle Resources
-   2. Press the `+` button and add the dictionary directory you added earlier.
+   2. Press the `+` button and select the dictionary directory you added earlier.
 
 #### Finishing up
 
@@ -86,7 +86,7 @@ This repository provides an [already-compiled IPADic](#) for download. IPADic is
 
 ### IPADic React Hook
 
-This module provides a React hook which makes the usage relatively simple. It could be imported as shown below:
+This module provides a React hook which makes the usage of MeCab relatively simple. It could be imported as shown below:
 
 ```tsx
 import { useMeCabIpaDic } from 'react-native-mecab';
@@ -182,14 +182,14 @@ If you want to use a different dictionary or have a use case with which you can'
 import { MeCab } from 'react-native-mecab';
 ```
 
-After instantiation, the asynchronous `.init` method needs to be called with the dictionary directory (relative to the assets root) passed as the first argument.
+After instantiation, the asynchronous `.init` method needs to be called with the path to the dictionary directory (relative to the assets root) passed as the first argument.
 
 ```tsx
 const mecab = new MeCab();
 mecab.init('ipadic').catch(console.error);
 ```
 
-After successful initialization, you can parse a Japanese sentence using the `.tokenize` method, which will resolve with a tokenization result string.
+After successful initialization, you can parse a Japanese sentence using the asynchronous `.tokenize` method, which will resolve with a tokenization result string.
 
 ```tsx
 mecab.tokenize('これは猫です。').then((result) => {
@@ -207,7 +207,7 @@ The result string will resemble the following:
 。: 記号,句点,*,*,*,*,。,。,。
 ```
 
-After you're done with using the instance, make sure to call the `.dispose` method. If you lose the reference to the given MeCab instance without calling this method first, then it will cause a memory leak.
+After you're done with using the instance, make sure to call the asynchronous `.dispose` method. If you lose the reference to the given MeCab instance without calling this method first, then it will cause a memory leak.
 
 ```tsx
 mecab.dispose().catch(console.error);
