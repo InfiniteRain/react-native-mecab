@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { MeCab } from 'react-native-mecab';
 
-type HookState = 'loading' | 'ok' | 'error';
+export type HookState = 'loading' | 'ok' | 'error';
 
 type LoadingReturn = {
   state: 'loading';
