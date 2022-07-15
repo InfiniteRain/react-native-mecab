@@ -10,7 +10,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		67225A79287B67A100C6A200 /* ipadic in Resources */ = {isa = PBXBuildFile; fileRef = 67225A78287B67A100C6A200 /* ipadic */; };
+		67225A86288190BF00C6A200 /* ipadic in Resources */ = {isa = PBXBuildFile; fileRef = 67225A78287B67A100C6A200 /* ipadic */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		D2332894411E1DDC6D603627 /* libPods-MecabExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F71D0CC4D31C8D856BC8F1C8 /* libPods-MecabExample.a */; };
 /* End PBXBuildFile section */
@@ -164,9 +164,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				67225A86288190BF00C6A200 /* ipadic in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				67225A79287B67A100C6A200 /* ipadic in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
