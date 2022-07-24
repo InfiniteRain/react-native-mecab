@@ -14,6 +14,7 @@
     "ios",
     "cpp",
     "react-native-mecab.podspec",
+    "NOTICE.txt",
     "!lib/typescript/example",
     "!android/build",
     "!ios/build",
