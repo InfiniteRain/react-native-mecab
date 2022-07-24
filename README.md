@@ -86,7 +86,7 @@ This repository provides an [already-compiled IPADic](https://github.com/Infinit
 
 ### IPADic React Hook
 
-This module provides a React hook which makes the usage of MeCab relatively simple. It could be imported as shown below:
+This module provides a React hook which makes the usage of MeCab relatively simple. Before using it, make sure that you have completed the second step of the [finishing up](#finishing-up) section above. The hook could be imported as shown below:
 
 ```tsx
 import { useMeCabIpaDic } from 'react-native-mecab';
