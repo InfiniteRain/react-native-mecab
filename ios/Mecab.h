@@ -6,8 +6,5 @@
 
 #endif
 
-@interface Mecab : NSObject <RCTBridgeModule> {
-    NSMutableDictionary *ptrMap;
-}
-
+@interface Mecab : NSObject <RCTBridgeModule>
 @end
